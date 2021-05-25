@@ -1,0 +1,138 @@
+---
+title: "Assignment 4"
+author: "Sulata Dhakal"
+date: "5/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1
+
+The World Values Survey is an ongoing worldwide survey that polls the world population about perceptions of life, work, family, politics, etc. The most recent phase of the survey that polled 77,882 people from 57 countries estimates that 36.2% of the world's population agrees with the statement "Men should have more right to a job than women." The survey also estimates that 13.8% of people have a university degree or higher and that 3.6% of people fit both criteria.
+
+```{r}
+total_sample <- 77882
+#Let us assume that P_A is sample that agrees with the statement and P_B is sample that disagrees with the statement
+P_A <- round(36.2/100*total_sample)
+P_B <- round(total_sample - P_A)
+#Let us assume that P_C is sample with university degree or higher and P_D is sample without a degree
+P_C <- round(13.8/100*total_sample)
+P_D <- round(total_sample - P_C)
+#Let us assume A_C is sample that agrees with statement as well as has university degree or higher
+A_C <- round(3.6/100*total_sample) 
+A_NC <- P_C - A_C #Uni degree and disagree
+A_D <- P_A - A_C #No Uni degree and agree
+B_D <- P_B - A_NC #No Uni degree and disagree
+final_matrix <- matrix(data=c(A_C,A_NC,P_C,A_D,B_D,P_D,P_A,P_B,total_sample),nrow=3,ncol=3, byrow=TRUE,dimnames=list(c("Uni_degree+","No_Unidegree","Total"),c("Agree","Disagree","Total")))
+final_matrix
+```
+
+## Question 1
+
+Are agreeing with the statement "Men should have more right to a job than women" and having a university degree or higher disjoint events?
+Answer:
+These are not disjoint events as 3.6% of people fit both criteria.
+
+## Question 2
+
+Draw a Venn diagram summarizing the variables and their associated probabilities.
+
+```{r}
+library(VennDiagram)
+vennplot <- draw.pairwise.venn(area1 = 0.362, area2 = 0.138, cross.area = 0.036, category = c("Agree","UniDegree"), euler.d = TRUE, scaled = TRUE, fill = c("red","blue"), cex = 2, cat.cex = 2, cat.default.pos = "outer")
+grid.draw(vennplot)
+grid.newpage()
+```
+## Question 3
+
+What is the probability that a randomly drawn person has a university degree or higher or agrees with the statement about men having more right to a job than women?
+
+```{r}
+probAC <- (final_matrix[1,3]+final_matrix[3,1]-final_matrix[1,1])/final_matrix[3,3]
+print(probAC)
+```
+## Question 4
+
+What percent of the world population do not have a university degree and disagree with the statement about men having more right to a job than women?
+
+```{r}
+D_Bper <- (final_matrix[2,2]/final_matrix[3,3])*100
+print(D_Bper)
+```
+## Question 5
+
+Does it appear that the event that someone agrees with the statement is independent of the event that they have a university degree or higher?
+Answer:
+The two events are not independent as it doesn't meet the independent event.
+
+## Question 6
+
+What is the probability that at least 1 in 5 randomly selected people to agree with the statement about men having more right to a job than women?
+
+```{r}
+#Binomial Distribution
+BinoC <- 1-((final_matrix[3,2]/final_matrix[3,3])^5)
+BinoC
+```
+
+## Data 2
+
+As of 2009, Swaziland had the highest HIV prevalence in the world. 25.9% of this country's population is infected with HIV. The ELISA test is one of the first and most accurate tests for HIV. For those who carry HIV, the ELISA test is 99.7% accurate. For those who do not carry HIV, the test is 92.6% accurate. If an individual from Swaziland has tested positive, what is the probability that he carries HIV? Create a tree diagram to calculate the probability.
+
+```{r}
+Infected <- 25.9/100
+Not_Infected <- 1-Infected
+Infected_Positive <- 99.7/100
+Infected_Negative <- 1-Infected_Positive
+Not_Infected_Negative <- 92.6/100
+Not_Infected_Positive <- 1-Not_Infected_Negative
+```
+## Question 1
+
+If an individual from Swaziland has tested positive, what is the probability that he carries HIV?
+
+```{r}
+P_IP <- Infected_Positive*Infected
+P_IN <- Infected_Negative*Infected
+P_NIP <- Not_Infected_Positive*Not_Infected
+P_NIN <- Not_Infected_Negative*Not_Infected
+Prob_Ind <- P_IP/(P_IP+P_NIP)
+Prob_Ind
+```
+
+## Question 2
+
+According to a 2013 Gallup poll, worldwide only 13% of employees are engaged at work (psychologically committed to their jobs and likely to be making positive contributions to their organizations). Among a random sample of 10 employees, what is the probability that 8 of them are engaged at work?
+
+```{r}
+#Binomial distribution. n=10,r=8,p=0.13,q=0.87 We have to find P(X=8)
+dbinom(x=8,size=10,prob=0.13)
+```
+
+## Question 3
+
+Recent study: “Facebook users get more than they give”
+
+friend requests: 40% made, 63% received at least one
+likes: liked 14 times, had their content “liked” 20 times, on average
+messages: sent 9 messages, received 12, on average
+ tags:12% tagged a friend in a photo, but 35% tagged other findings:
+25% considered power users
+average Facebook user has 245 friends
+P(70 or more power user friends) = ?
+
+```{r}
+dbinom(70,245,0.25)
+```
+
+## Question 4
+
+According to a 2014 Gallup poll, 56% of uninsured Americans who plan to get health insurance say they will do so through a government health insurance exchange. What is the probability that in a random sample of 10 people exactly 6 plan to get health insurance through a government health insurance exchange?
+
+```{r}
+# binomial distr
+dbinom(size=10,prob = 0.56,x=6)
+```
